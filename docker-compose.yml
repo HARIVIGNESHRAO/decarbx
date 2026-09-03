@@ -1,0 +1,23 @@
+services:
+  mongodb:
+    image: mongo:8
+    restart: unless-stopped
+    ports:
+      - "27018:27017"
+    volumes:
+      - decarbx_mongodb:/data/db
+  api:
+    image: python:3.13-slim
+    working_dir: /app
+    command: sh -c "pip install -r requirements.txt && uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
+    environment:
+      MONGODB_URL: mongodb://mongodb:27017
+      MONGODB_DATABASE: decarbx
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - mongodb
+volumes:
+  decarbx_mongodb:
