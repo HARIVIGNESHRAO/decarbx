@@ -25,14 +25,17 @@ DATABASE_NAME=os.getenv("MONGODB_DATABASE","decarbx")
 JWT_SECRET=os.getenv("JWT_SECRET","dev-only-change-this-decarbx-secret")
 JWT_ALGORITHM="HS256"
 ACCESS_TOKEN_MINUTES=int(os.getenv("ACCESS_TOKEN_MINUTES","480"))
-ORIGINS=[
+DEFAULT_ORIGINS={
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "https://decarbx-lovat.vercel.app",
+}
+CONFIGURED_ORIGINS={
     origin.strip().rstrip("/")
-    for origin in os.getenv(
-        "FRONTEND_ORIGINS",
-        "http://localhost:5173,http://127.0.0.1:5173",
-    ).split(",")
+    for origin in os.getenv("FRONTEND_ORIGINS", "").split(",")
     if origin.strip()
-]
+}
+ORIGINS=sorted(DEFAULT_ORIGINS | CONFIGURED_ORIGINS)
 client=MongoClient(MONGODB_URL,serverSelectionTimeoutMS=2500)
 db=client[DATABASE_NAME]
 password_hash=PasswordHash((BcryptHasher(),))
