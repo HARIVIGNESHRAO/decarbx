@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
 import { CheckCircle2, Database, FileText, Plus, RefreshCw, Search, ShieldAlert } from 'lucide-react'
+import { api } from './services/api'
 
 const slugs={'Carbon accounting':'carbon-accounting','Product footprint':'product-footprint','Suppliers':'suppliers','Reduction planning':'reduction-planning','Data & integrations':'data-integrations','Reports & disclosures':'reports-disclosures'}
 
 export default function ModulePage({name,token}){
   const [data,setData]=useState(null),[error,setError]=useState(''),[loading,setLoading]=useState(true),[query,setQuery]=useState(''),[refresh,setRefresh]=useState(0)
-  useEffect(()=>{fetch(`/api/modules/${slugs[name]}`,{headers:{Authorization:`Bearer ${token}`}}).then(r=>{if(!r.ok)throw new Error('Could not load this module');return r.json()}).then(setData).catch(e=>setError(e.message)).finally(()=>setLoading(false))},[name,token,refresh])
+  useEffect(()=>{api(`/modules/${slugs[name]}`,{token}).then(setData).catch(e=>setError(e.message)).finally(()=>setLoading(false))},[name,token,refresh])
   const reload=()=>{setLoading(true);setError('');setRefresh(x=>x+1)}
   if(loading)return <div className="module-state"><RefreshCw className="spin"/><strong>Loading {name}…</strong></div>
   if(error)return <div className="module-state error"><ShieldAlert/><strong>{error}</strong><button onClick={reload}>Try again</button></div>

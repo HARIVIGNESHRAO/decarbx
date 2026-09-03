@@ -25,7 +25,14 @@ DATABASE_NAME=os.getenv("MONGODB_DATABASE","decarbx")
 JWT_SECRET=os.getenv("JWT_SECRET","dev-only-change-this-decarbx-secret")
 JWT_ALGORITHM="HS256"
 ACCESS_TOKEN_MINUTES=int(os.getenv("ACCESS_TOKEN_MINUTES","480"))
-ORIGINS=os.getenv("FRONTEND_ORIGINS","http://localhost:5173,http://127.0.0.1:5173").split(",")
+ORIGINS=[
+    origin.strip().rstrip("/")
+    for origin in os.getenv(
+        "FRONTEND_ORIGINS",
+        "http://localhost:5173,http://127.0.0.1:5173",
+    ).split(",")
+    if origin.strip()
+]
 client=MongoClient(MONGODB_URL,serverSelectionTimeoutMS=2500)
 db=client[DATABASE_NAME]
 password_hash=PasswordHash((BcryptHasher(),))
